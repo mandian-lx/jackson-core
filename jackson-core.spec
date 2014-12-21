@@ -1,27 +1,19 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:          jackson-core
-Version:       2.2.2
-Release:       3.1%{?dist}
+Version:       2.4.2
+Release:       1.1
+Group:		Development/Java
 Summary:       Core part of Jackson
 License:       ASL 2.0
 URL:           http://wiki.fasterxml.com/JacksonHome
 Source0:       https://github.com/FasterXML/jackson-core/archive/%{name}-%{version}.tar.gz
-# jackson-core package don't include the license file
-# https://github.com/FasterXML/jackson-core/issues/88
-Source1:       http://www.apache.org/licenses/LICENSE-2.0.txt
 
-BuildRequires: java-devel
-BuildRequires: mvn(com.fasterxml:oss-parent) >= 10
+BuildRequires: mvn(com.fasterxml.jackson:jackson-parent:pom:)
 
 # test deps
 BuildRequires: mvn(junit:junit)
 
 BuildRequires: maven-local
-BuildRequires: maven-install-plugin
-BuildRequires: maven-enforcer-plugin
-BuildRequires: maven-plugin-bundle
-BuildRequires: maven-source-plugin
-BuildRequires: maven-surefire-provider-junit4
 BuildRequires: replacer
 
 Provides:      jackson2-core = %{version}-%{release}
@@ -42,7 +34,6 @@ This package contains javadoc for %{name}.
 %prep
 %setup -q -n %{name}-%{name}-%{version}
 
-%pom_xpath_remove "pom:build/pom:extensions/pom:extension[pom:artifactId='wagon-gitsite']"
 # remove unavailable com.google.doclava doclava 1.0.3
 %pom_xpath_remove "pom:reporting/pom:plugins/pom:plugin[pom:artifactId='maven-javadoc-plugin']/pom:configuration"
 %pom_xpath_inject "pom:reporting/pom:plugins/pom:plugin[pom:artifactId='maven-javadoc-plugin']" '
@@ -52,8 +43,11 @@ This package contains javadoc for %{name}.
   <source>${javac.src.version}</source>
 </configuration>'
 
-cp -p %{SOURCE1} .
-sed -i 's/\r//' LICENSE-2.0.txt
+%pom_xpath_remove "pom:build/pom:plugins/pom:plugin[pom:artifactId='maven-javadoc-plugin']/pom:executions"
+
+cp -p src/main/resources/META-INF/LICENSE .
+cp -p src/main/resources/META-INF/NOTICE .
+sed -i 's/\r//' LICENSE NOTICE
 
 %build
 %mvn_file : %{name}
@@ -63,12 +57,27 @@ sed -i 's/\r//' LICENSE-2.0.txt
 %mvn_install
 
 %files -f .mfiles
-%doc LICENSE-2.0.txt README.md
+%doc LICENSE NOTICE README.md release-notes/*
 
 %files javadoc -f .mfiles-javadoc
-%doc LICENSE-2.0.txt
+%doc LICENSE NOTICE
 
 %changelog
+* Sat Sep 20 2014 gil cattaneo <puntogil@libero.it> 2.4.2-1
+- update to 2.4.2
+
+* Wed Jul 23 2014 gil cattaneo <puntogil@libero.it> 2.4.1.1-1
+- update to 2.4.1.1
+
+* Wed Jul 02 2014 gil cattaneo <puntogil@libero.it> 2.4.1-1
+- update to 2.4.1
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Fri Mar 28 2014 Michael Simacek <msimacek@redhat.com> - 2.2.2-4
+- Use Requires: java-headless rebuild (#1067528)
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
