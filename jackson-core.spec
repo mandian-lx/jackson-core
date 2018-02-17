@@ -3,6 +3,7 @@
 Name:          jackson-core
 Version:       2.9.4
 Release:       2.1
+Group:         Development/Java
 Summary:       Core part of Jackson
 License:       ASL 2.0
 URL:           https://github.com/FasterXML/jackson-core/
